@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="290" viewBox="0 0 900 290" role="img" aria-labelledby="title desc">
+  <title id="title">Memory management</title>
+  <desc id="desc">Resource ownership for SDL handles, standard containers, account pointer stability, and cleanup.</desc>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#172033;font-size:16px}.box{fill:#f7fbff;stroke:#2f6db5;stroke-width:2;rx:8}.warn{fill:#fff8e8;stroke:#9a6a13;stroke-width:2;rx:8}.line{stroke:#2f6db5;stroke-width:2;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2f6db5"/></marker></defs>
+  <rect x="350" y="25" width="200" height="65" class="box"/><text x="450" y="64" text-anchor="middle">Game object</text>
+  <rect x="65" y="150" width="170" height="80" class="warn"/><text x="150" y="182" text-anchor="middle">SDL_Window*</text><text x="150" y="205" text-anchor="middle">SDL_Renderer*</text>
+  <rect x="285" y="150" width="170" height="80" class="box"/><text x="370" y="182" text-anchor="middle">Board +</text><text x="370" y="205" text-anchor="middle">vectors</text>
+  <rect x="505" y="150" width="170" height="80" class="box"/><text x="590" y="182" text-anchor="middle">deque accounts</text><text x="590" y="205" text-anchor="middle">stable pointers</text>
+  <rect x="705" y="150" width="140" height="80" class="box"/><text x="775" y="182" text-anchor="middle">Destructor</text><text x="775" y="205" text-anchor="middle">cleanupSdl()</text>
+  <path d="M390 90 L180 150" class="line"/><path d="M430 90 L375 150" class="line"/><path d="M500 90 L585 150" class="line"/><path d="M535 70 L750 150" class="line"/>
+</svg>

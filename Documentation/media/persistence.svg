@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="280" viewBox="0 0 900 280" role="img" aria-labelledby="title desc">
+  <title id="title">Persistence model</title>
+  <desc id="desc">Text persistence for user accounts, stats, color settings, and match history.</desc>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#172033;font-size:16px}.box{fill:#f7fbff;stroke:#2f6db5;stroke-width:2;rx:8}.file{fill:#fff8e8;stroke:#9a6a13;stroke-width:2;rx:8}.line{stroke:#2f6db5;stroke-width:2;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2f6db5"/></marker></defs>
+  <rect x="80" y="90" width="190" height="90" class="box"/><text x="175" y="124" text-anchor="middle">AccountManager</text><text x="175" y="150" text-anchor="middle">users, colors, stats</text>
+  <rect x="360" y="55" width="180" height="70" class="file"/><text x="450" y="84" text-anchor="middle">users.txt</text><text x="450" y="107" text-anchor="middle">CSV rows</text>
+  <rect x="360" y="160" width="180" height="70" class="file"/><text x="450" y="189" text-anchor="middle">history.txt</text><text x="450" y="212" text-anchor="middle">pipe-delimited rows</text>
+  <rect x="635" y="90" width="190" height="90" class="box"/><text x="730" y="124" text-anchor="middle">HistoryManager</text><text x="730" y="150" text-anchor="middle">match records</text>
+  <path d="M270 120 L360 92" class="line"/><path d="M635 150 L540 195" class="line"/><path d="M540 90 L635 120" class="line"/><path d="M360 195 L270 150" class="line"/>
+</svg>

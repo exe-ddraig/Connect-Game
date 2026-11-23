@@ -1,0 +1,17 @@
+.vs/
+x64/
+Debug/
+Release/
+ConnectGame/
+connect_four
+users.txt
+history.txt
+SDL2.dll
+*.pdb
+*.ilk
+*.obj
+*.idb
+*.ipch
+*.tlog
+*.log
+*.user

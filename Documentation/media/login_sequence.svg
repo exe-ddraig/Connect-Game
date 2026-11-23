@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" role="img" aria-labelledby="title desc">
+  <title id="title">Login sequence</title>
+  <desc id="desc">Login, registration, guest flow, account persistence, and post-login menu sequence.</desc>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#172033;font-size:16px}.box{fill:#f7fbff;stroke:#2f6db5;stroke-width:2;rx:8}.line{stroke:#2f6db5;stroke-width:2;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2f6db5"/></marker></defs>
+  <rect x="35" y="105" width="130" height="70" class="box"/><text x="100" y="135" text-anchor="middle">Main</text><text x="100" y="158" text-anchor="middle">Menu</text>
+  <rect x="210" y="105" width="140" height="70" class="box"/><text x="280" y="135" text-anchor="middle">P1 Login</text><text x="280" y="158" text-anchor="middle">or Register</text>
+  <rect x="395" y="105" width="140" height="70" class="box"/><text x="465" y="135" text-anchor="middle">P2 Login</text><text x="465" y="158" text-anchor="middle">or Guest</text>
+  <rect x="580" y="55" width="140" height="70" class="box"/><text x="650" y="85" text-anchor="middle">Guest</text><text x="650" y="108" text-anchor="middle">Name</text>
+  <rect x="580" y="180" width="140" height="70" class="box"/><text x="650" y="210" text-anchor="middle">users.txt</text><text x="650" y="233" text-anchor="middle">Save/Load</text>
+  <rect x="760" y="105" width="115" height="70" class="box"/><text x="817" y="135" text-anchor="middle">Post Login</text><text x="817" y="158" text-anchor="middle">Menu</text>
+  <path d="M165 140 L210 140" class="line"/><path d="M350 140 L395 140" class="line"/><path d="M535 120 L580 92" class="line"/><path d="M535 160 L580 205" class="line"/><path d="M720 90 L760 125" class="line"/><path d="M720 215 L780 175" class="line"/>
+</svg>

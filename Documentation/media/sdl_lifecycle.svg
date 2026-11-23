@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="240" viewBox="0 0 900 240" role="img" aria-labelledby="title desc">
+  <title id="title">SDL lifecycle</title>
+  <desc id="desc">SDL initializes video, creates a window and renderer, runs the loop, presents frames, and cleans up resources.</desc>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#172033;font-size:16px}.box{fill:#f7fbff;stroke:#2f6db5;stroke-width:2;rx:8}.line{stroke:#2f6db5;stroke-width:2;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2f6db5"/></marker></defs>
+  <rect x="30" y="85" width="130" height="70" class="box"/><text x="95" y="115" text-anchor="middle">SDL_Init</text><text x="95" y="138" text-anchor="middle">video</text>
+  <rect x="195" y="85" width="150" height="70" class="box"/><text x="270" y="115" text-anchor="middle">Create</text><text x="270" y="138" text-anchor="middle">window</text>
+  <rect x="380" y="85" width="150" height="70" class="box"/><text x="455" y="115" text-anchor="middle">Create</text><text x="455" y="138" text-anchor="middle">renderer</text>
+  <rect x="565" y="85" width="150" height="70" class="box"/><text x="640" y="115" text-anchor="middle">Poll, update,</text><text x="640" y="138" text-anchor="middle">render</text>
+  <rect x="750" y="85" width="120" height="70" class="box"/><text x="810" y="115" text-anchor="middle">Destroy +</text><text x="810" y="138" text-anchor="middle">SDL_Quit</text>
+  <path d="M160 120 L195 120" class="line"/><path d="M345 120 L380 120" class="line"/><path d="M530 120 L565 120" class="line"/><path d="M715 120 L750 120" class="line"/>
+</svg>

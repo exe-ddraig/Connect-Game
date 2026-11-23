@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ConnectGame.vcxproj" Id="82927d58-3fdd-4bb1-be04-a6db70d56f9f" />
+</Solution>

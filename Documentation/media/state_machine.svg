@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-labelledby="title desc">
+  <title id="title">Game state machine</title>
+  <desc id="desc">GameState transitions from main menu through login, menus, settings, play, history, high scores, and game over.</desc>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#172033;font-size:15px}.node{fill:#f7fbff;stroke:#2f6db5;stroke-width:2;rx:8}.line{stroke:#2f6db5;stroke-width:2;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2f6db5"/></marker></defs>
+  <rect x="35" y="145" width="130" height="55" class="node"/><text x="100" y="178" text-anchor="middle">MAIN_MENU</text>
+  <rect x="210" y="70" width="120" height="55" class="node"/><text x="270" y="103" text-anchor="middle">LOGIN_P1</text>
+  <rect x="210" y="220" width="120" height="55" class="node"/><text x="270" y="253" text-anchor="middle">LOGIN_P2</text>
+  <rect x="375" y="220" width="145" height="55" class="node"/><text x="447" y="253" text-anchor="middle">P2_GUEST</text>
+  <rect x="565" y="145" width="165" height="55" class="node"/><text x="647" y="178" text-anchor="middle">POST_LOGIN</text>
+  <rect x="775" y="40" width="100" height="45" class="node"/><text x="825" y="68" text-anchor="middle">HISTORY</text>
+  <rect x="765" y="115" width="120" height="45" class="node"/><text x="825" y="143" text-anchor="middle">SCORES</text>
+  <rect x="770" y="190" width="110" height="45" class="node"/><text x="825" y="218" text-anchor="middle">SETTINGS</text>
+  <rect x="580" y="285" width="135" height="55" class="node"/><text x="647" y="318" text-anchor="middle">PLAYING</text>
+  <rect x="780" y="285" width="105" height="55" class="node"/><text x="832" y="318" text-anchor="middle">GAME_OVER</text>
+  <path d="M165 160 L210 110" class="line"/><path d="M300 125 L260 220" class="line"/><path d="M330 247 L375 247" class="line"/><path d="M520 247 L590 200" class="line"/><path d="M330 235 L580 180" class="line"/><path d="M730 160 L785 85" class="line"/><path d="M730 170 L765 145" class="line"/><path d="M730 185 L775 200" class="line"/><path d="M650 200 L650 285" class="line"/><path d="M715 312 L780 312" class="line"/>
+</svg>

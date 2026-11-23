@@ -1,0 +1,448 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Connect Four SDL2 Documentation</title>
+<style>
+@page { size: A4; margin: 16mm 14mm; }
+body { font-family: Arial, Helvetica, sans-serif; color: #172033; line-height: 1.45; font-size: 11.2pt; }
+h1 { color: #123F7A; font-size: 28pt; margin: 0 0 6px; }
+h2 { color: #164A8B; border-bottom: 2px solid #D7E6FA; padding-bottom: 4px; page-break-after: avoid; }
+h3 { color: #235D9A; margin-bottom: 6px; page-break-after: avoid; }
+.subtitle { font-size: 13pt; color: #4B5D75; margin-bottom: 26px; }
+.toc li { margin: 4px 0; }
+.figure { text-align: center; margin: 14px 0 20px; page-break-inside: avoid; }
+.figure img { max-width: 100%; max-height: 215mm; border: 1px solid #CCD8E8; padding: 8px; box-sizing: border-box; background: #fff; }
+.caption { color: #40536D; font-size: 9.5pt; margin-top: 5px; }
+pre { background: #F5F7FA; border: 1px solid #D9E1EC; border-left: 4px solid #2F6DB5; padding: 9px; overflow-wrap: break-word; white-space: pre-wrap; font-size: 9pt; page-break-inside: avoid; }
+code { font-family: Consolas, Monaco, monospace; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; page-break-inside: avoid; }
+th, td { border: 1px solid #CCD8E8; padding: 7px; vertical-align: top; }
+th { background: #EAF3FF; color: #153B69; }
+.note { background: #F7FBFF; border-left: 4px solid #2F6DB5; padding: 9px 11px; margin: 10px 0; }
+.palette-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0 18px; }
+.swatch { border: 1px solid #CCD8E8; padding: 8px; page-break-inside: avoid; background: #fff; }
+.swatch-chip { height: 28px; border: 1px solid rgba(0,0,0,0.2); margin-bottom: 6px; }
+.swatch-name { font-weight: bold; color: #17375E; }
+.swatch-code { font-family: Consolas, Monaco, monospace; font-size: 9pt; color: #4B5D75; }
+.pagebreak { page-break-before: always; }
+</style>
+</head>
+<body>
+<h1>Connect Four SDL2 Documentation</h1>
+<div class="subtitle">Architecture, SDL usage, source layout, classes, objects, game states, rendering, persistence, memory management, and core game logic.</div>
+
+<h2>Table of Contents</h2>
+<ol class="toc">
+  <li>Project Overview</li>
+  <li>SDL2 Library Usage</li>
+  <li>Color Palette and Game Branding</li>
+  <li>Source Layout, Architecture, and UML Diagrams</li>
+  <li>Classes, Objects, and Data Models</li>
+  <li>Game State Machine</li>
+  <li>Login, Guest Flow, and Persistence</li>
+  <li>Rendering System and UI Functions</li>
+  <li>Board Logic and Win Detection</li>
+  <li>Animation and Particles</li>
+  <li>Memory Management and Cleanup</li>
+  <li>Build and Run Notes</li>
+</ol>
+
+<h2>1. Project Overview</h2>
+<p>
+This project is a complete Connect Four game written in C++ using SDL2 for window creation,
+input events, drawing, timing, and frame presentation. The program is contained mainly in
+<code>ConnectGame.cpp</code> and the project headers. It implements account login/registration, optional guest play for player 2,
+match history, high scores, color settings, animated coin drops, particles, and a fullscreen game board.
+</p>
+<p>
+The game uses a simple object-oriented structure. The <code>Game</code> class owns the SDL handles,
+the current screen state, the board, account manager, history manager, active players, particles,
+and render/update functions. Smaller classes and structs carry focused responsibilities:
+<code>Board</code> owns grid logic, <code>AccountManager</code> owns user records, and
+<code>HistoryManager</code> owns saved matches.
+</p>
+
+<div class="figure">
+  <img src="media/architecture.svg" alt="High-level architecture of the Connect Four SDL2 project.">
+  <div class="caption">Figure: High-level architecture of the Connect Four SDL2 project.</div>
+</div>
+
+
+<h2>2. SDL2 Library Usage</h2>
+<p>
+SDL2 is the platform layer used by the game. Instead of using operating-system-specific APIs
+directly, the code asks SDL to create a fullscreen desktop window, create a hardware-accelerated
+renderer, read keyboard and mouse events, measure time, and present rendered frames.
+</p>
+<table>
+<tr><th>SDL Feature</th><th>Where It Is Used</th><th>Purpose</th></tr>
+<tr><td><code>SDL_Init(SDL_INIT_VIDEO)</code></td><td><code>Game::Game()</code></td><td>Starts SDL's video subsystem.</td></tr>
+<tr><td><code>SDL_CreateWindow</code></td><td><code>Game::Game()</code></td><td>Creates the fullscreen game window.</td></tr>
+<tr><td><code>SDL_CreateRenderer</code></td><td><code>Game::Game()</code></td><td>Creates the drawing context used by every render function.</td></tr>
+<tr><td><code>SDL_PollEvent</code></td><td><code>Game::run()</code></td><td>Reads input and quit events without blocking the frame loop.</td></tr>
+<tr><td><code>SDL_GetTicks</code></td><td><code>Game::run()</code>, match duration</td><td>Measures elapsed time for animation and saves completed match duration as <code>MM:SS</code>.</td></tr>
+<tr><td><code>SDL_RenderFillRect</code>, <code>SDL_RenderDrawLine</code>, points</td><td>Drawing helpers</td><td>Draws panels, buttons, glyphs, board, rings, and effects.</td></tr>
+<tr><td><code>SDL_RenderPresent</code></td><td><code>Game::run()</code></td><td>Displays the completed frame.</td></tr>
+</table>
+<pre><code>if(SDL_Init(SDL_INIT_VIDEO)!=0)
+    throw runtime_error(string(&quot;SDL_Init failed: &quot;)+SDL_GetError());
+
+window=SDL_CreateWindow(&quot;Connect Four&quot;,
+    SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,
+    0,0,SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+renderer=SDL_CreateRenderer(window,-1,
+    SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);</code></pre>
+<p>
+The renderer is central to the whole program. Every shape, text glyph, coin, panel, button,
+and board cell is drawn manually through SDL drawing calls. There is no external font library:
+the game defines its own 5 by 7 pixel font and draws it with small filled rectangles.
+</p>
+
+<div class="figure">
+  <img src="media/sdl_lifecycle.svg" alt="SDL initialization, runtime, cleanup, and error path.">
+  <div class="caption">Figure: SDL initialization, runtime, cleanup, and error path.</div>
+</div>
+
+
+<h2>3. Color Palette and Game Branding</h2>
+<p>
+The game has a neon arcade identity built around a deep space background, electric blue UI borders,
+and vivid coin colors. These colors are not decorative only; they are part of gameplay because players
+choose coin colors from the palette and the same selected colors are reused in turn indicators, settings
+tabs, winner announcements, and coin rendering.
+</p>
+<div class="palette-grid">
+  <div class="swatch"><div class="swatch-chip" style="background:#E63C3C"></div><div class="swatch-name">RED</div><div class="swatch-code">RGB(230, 60, 60) / #E63C3C</div></div>
+  <div class="swatch"><div class="swatch-chip" style="background:#EBC828"></div><div class="swatch-name">YELLOW</div><div class="swatch-code">RGB(235, 200, 40) / #EBC828</div></div>
+  <div class="swatch"><div class="swatch-chip" style="background:#3CA0E6"></div><div class="swatch-name">BLUE</div><div class="swatch-code">RGB(60, 160, 230) / #3CA0E6</div></div>
+  <div class="swatch"><div class="swatch-chip" style="background:#3CD250"></div><div class="swatch-name">GREEN</div><div class="swatch-code">RGB(60, 210, 80) / #3CD250</div></div>
+  <div class="swatch"><div class="swatch-chip" style="background:#D250D2"></div><div class="swatch-name">PURPLE</div><div class="swatch-code">RGB(210, 80, 210) / #D250D2</div></div>
+  <div class="swatch"><div class="swatch-chip" style="background:#F08C1E"></div><div class="swatch-name">ORANGE</div><div class="swatch-code">RGB(240, 140, 30) / #F08C1E</div></div>
+</div>
+<table>
+<tr><th>Brand Element</th><th>Color</th><th>Purpose in the Game</th></tr>
+<tr><td>Space background</td><td><code>RGB(6, 6, 18)</code> / <code>#060612</code></td><td>Dark base color used by <code>renderBackground()</code>, making coins and neon UI stand out.</td></tr>
+<tr><td>Main panel fill</td><td><code>RGB(8, 10, 28)</code> / <code>#080A1C</code></td><td>Used by <code>drawPanel()</code> for menus, login, settings, and overlays.</td></tr>
+<tr><td>Primary UI blue</td><td><code>RGB(80, 140, 255)</code> / <code>#508CFF</code></td><td>Used for titles, panel borders, glow effects, and main interactive controls.</td></tr>
+<tr><td>Board blue</td><td><code>RGB(20, 68, 188)</code> / <code>#1444BC</code></td><td>Main physical board color in <code>renderGameBoard()</code>.</td></tr>
+<tr><td>Board highlight</td><td><code>RGB(55, 108, 228)</code> / <code>#376CE4</code></td><td>Top board highlight lines and depth accents.</td></tr>
+<tr><td>Success green</td><td><code>RGB(80, 180, 80)</code> / <code>#50B450</code></td><td>Login/continue/save buttons and positive actions.</td></tr>
+<tr><td>Error red</td><td><code>RGB(230, 80, 80)</code> / <code>#E65050</code></td><td>Error messages and destructive/exit actions.</td></tr>
+</table>
+<pre><code>struct CoinColor { Uint8 r, g, b; const char* name; };
+static const CoinColor PALETTE[] = {
+    { 230,  60,  60, &quot;RED&quot;    },
+    { 235, 200,  40, &quot;YELLOW&quot; },
+    {  60, 160, 230, &quot;BLUE&quot;   },
+    {  60, 210,  80, &quot;GREEN&quot;  },
+    { 210,  80, 210, &quot;PURPLE&quot; },
+    { 240, 140,  30, &quot;ORANGE&quot; },
+};</code></pre>
+<p>
+The selected color is stored as an index, not as duplicated RGB values. This keeps persistent files small
+and ensures that rendering always uses the official palette values.
+</p>
+
+<h2>4. Source Layout, Architecture, and UML Diagrams</h2>
+<p>
+The Visual Studio project builds <code>ConnectGame.cpp</code>, which contains the entry point and includes
+<code>game.h</code>. The larger implementation is header-based: <code>game.h</code> includes
+<code>board.h</code> and <code>user.h</code>, and those headers share constants and data structures from
+<code>common.h</code>. The small <code>board.cpp</code>, <code>game.cpp</code>, and <code>user.cpp</code>
+files currently only include their matching headers and are not listed as compile items in
+<code>ConnectGame.vcxproj</code>.
+</p>
+<table>
+<tr><th>Path</th><th>Purpose</th></tr>
+<tr><td><code>ConnectGame.cpp</code></td><td>Program entry point. Creates <code>Game</code>, runs the main loop, and reports startup exceptions.</td></tr>
+<tr><td><code>common.h</code></td><td>Shared SDL/C++ includes, board constants, file names, game states, palette, and persistent data models.</td></tr>
+<tr><td><code>board.h</code></td><td>Header-only <code>Board</code> class for the 7 by 7 grid, drops, draw detection, and win scanning.</td></tr>
+<tr><td><code>user.h</code></td><td>Header-only account and history managers for <code>users.txt</code> and <code>history.txt</code>.</td></tr>
+<tr><td><code>game.h</code></td><td>Main SDL window, event loop, state machine, rendering, animation, scoring, and screen logic.</td></tr>
+<tr><td><code>ConnectGame.vcxproj</code></td><td>Visual Studio C++20 project. The x64 configurations reference SDL2 include and library paths.</td></tr>
+<tr><td><code>Documentation/</code></td><td>Project documentation in HTML, DOCX, and PDF forms. The HTML version uses SVG diagrams from <code>Documentation/media</code>.</td></tr>
+</table>
+<p>
+The game is organized around composition. <code>Game</code> owns its subsystems directly:
+the board, managers, active player objects, and visual effect arrays. This keeps lifetime simple:
+when <code>Game</code> is destroyed, its child objects are destroyed automatically, and the SDL
+handles are destroyed by <code>cleanupSdl()</code>.
+</p>
+
+<div class="figure">
+  <img src="media/class_diagram.svg" alt="UML-style class diagram showing data fields, methods, and ownership relationships.">
+  <div class="caption">Figure: UML-style class diagram showing data fields, methods, and ownership relationships.</div>
+</div>
+
+
+<h3>Main Object Relationships</h3>
+<table>
+<tr><th>Object</th><th>Responsibility</th></tr>
+<tr><td><code>Game</code></td><td>Main controller. It handles SDL setup, events, screens, rendering, gameplay, animations, and saving results.</td></tr>
+<tr><td><code>Board</code></td><td>Stores the 7x7 grid and contains all drop, full-board, and win-check logic.</td></tr>
+<tr><td><code>AccountManager</code></td><td>Loads, saves, registers, and authenticates users.</td></tr>
+<tr><td><code>HistoryManager</code></td><td>Loads, saves, and appends match records.</td></tr>
+<tr><td><code>SessionPlayer</code></td><td>Represents the two active players in the current session. It may point to a saved account or represent a guest.</td></tr>
+</table>
+
+<h2>5. Classes, Objects, and Data Models</h2>
+<h3>Board</h3>
+<p>
+The board uses <code>int board[ROWS][COLS]</code>. A value of <code>0</code> means empty,
+<code>1</code> means player 1, and <code>2</code> means player 2. The board is currently 7 by 7,
+which is controlled by the <code>ROWS</code> and <code>COLS</code> constants.
+</p>
+<pre><code>class Board {
+    int board[ROWS][COLS];
+public:
+    Board() { reset(); }
+    void reset();
+    bool dropCoin(int col, int player);
+    int getDropRow(int col) const;
+    int getCell(int r,int c) const;
+    bool isFull() const;
+    bool wincheck(int p) const;
+};</code></pre>
+
+<h3>AccountManager</h3>
+<p>
+The account manager stores <code>UserAccount</code> records in a <code>deque</code>. This is deliberate:
+the current session stores pointers to accounts. A <code>vector</code> can move its elements when it grows,
+which could leave player pointers invalid after registering a new user. A <code>deque</code> keeps element
+addresses stable for normal push-back growth, which is safer for this design.
+</p>
+<pre><code>class AccountManager {
+public:
+    deque&lt;UserAccount&gt; accounts;
+
+    void load();
+    void save();
+    UserAccount* login(const string&amp; user, const string&amp; pass);
+    bool registerUser(const string&amp; user, const string&amp; pass);
+    void saveAccount(const UserAccount&amp; updated);
+};</code></pre>
+
+<h3>SessionPlayer and UserAccount</h3>
+<p>
+<code>UserAccount</code> is persistent data loaded from disk. <code>SessionPlayer</code> is runtime data
+for the current match. A guest player has <code>account == nullptr</code>, so guest results are recorded
+in match history but do not update persistent account stats.
+</p>
+<pre><code>struct SessionPlayer {
+    bool         isGuest  = true;
+    string       name;
+    UserAccount* account  = nullptr;
+    int          colorIdx = 0;
+};</code></pre>
+
+<h2>6. Game State Machine</h2>
+<p>
+The enum <code>GameState</code> controls which screen is visible and which events matter.
+The render loop switches on this enum and calls exactly one screen renderer, except game over,
+where it renders the board and then draws the announcement overlay.
+</p>
+
+<div class="figure">
+  <img src="media/state_machine.svg" alt="GameState transitions for menu, login, guest play, settings, gameplay, and game over.">
+  <div class="caption">Figure: GameState transitions for menu, login, guest play, settings, gameplay, and game over.</div>
+</div>
+
+<pre><code>switch(state){
+case GameState::MAIN_MENU:       renderMainMenu(mx,my);      break;
+case GameState::LOGIN_P1:        renderLoginScreen(mx,my);   break;
+case GameState::LOGIN_P2:        renderLoginScreen(mx,my);   break;
+case GameState::P2_GUEST_NAME:   renderGuestName(mx,my);     break;
+case GameState::POST_LOGIN_MENU: renderPostLoginMenu(mx,my); break;
+case GameState::HISTORY:         renderHistory(mx,my);       break;
+case GameState::HIGH_SCORES:     renderHighScores(mx,my);    break;
+case GameState::SETTINGS:        renderSettings(mx,my);      break;
+case GameState::PLAYING:         renderGameBoard(dt);        break;
+case GameState::GAME_OVER:       renderGameBoard(dt);
+                                 renderAnnouncement(dt);     break;
+}</code></pre>
+
+<h2>7. Login, Guest Flow, and Persistence</h2>
+<p>
+The login screen is reused for player 1 and player 2. The variable <code>loginFor</code>
+decides whether successful login fills <code>p1</code> or <code>p2</code>. Player 2 may choose
+guest mode, which moves to <code>P2_GUEST_NAME</code> and stores only a display name.
+</p>
+
+<div class="figure">
+  <img src="media/login_sequence.svg" alt="Login, registration, guest flow, and account persistence sequence.">
+  <div class="caption">Figure: Login, registration, guest flow, and account persistence sequence.</div>
+</div>
+
+<p>
+Persistent files are intentionally simple text files:
+</p>
+<table>
+<tr><th>File</th><th>Format</th><th>Used By</th></tr>
+<tr><td><code>users.txt</code></td><td><code>username,password,p1ColorIdx,p2ColorIdx,wins,losses,draws,total</code></td><td><code>AccountManager</code></td></tr>
+<tr><td><code>history.txt</code></td><td><code>p1Name|p2Name|result|timeTaken</code></td><td><code>HistoryManager</code></td></tr>
+</table>
+<p>
+Account names are saved in lowercase. Match history stores display names in lowercase, the result as
+<code>P1</code>, <code>P2</code>, or <code>DRAW</code>, and match duration as <code>MM:SS</code>.
+Stats are updated only for players backed by a saved account; guest players appear in history but do not
+change persistent win/loss/draw totals.
+</p>
+
+<div class="figure">
+  <img src="media/persistence.svg" alt="Persistence model for user accounts, stats, settings, and match history.">
+  <div class="caption">Figure: Persistence model for user accounts, stats, settings, and match history.</div>
+</div>
+
+
+<h2>8. Rendering System and UI Functions</h2>
+<p>
+The program draws all UI manually. It has helper functions for panels, buttons, text, input fields,
+coins, circles, rings, particles, and board cells. This means the UI does not rely on images or font files.
+The visual style comes from colored rectangles, glow outlines, alpha blending, and a pixel font.
+</p>
+<table>
+<tr><th>Function</th><th>Purpose</th></tr>
+<tr><td><code>renderBackground()</code></td><td>Clears the screen and draws animated star pixels.</td></tr>
+<tr><td><code>drawPanel()</code></td><td>Draws the glowing dark panel used on menus and settings.</td></tr>
+<tr><td><code>drawButton()</code></td><td>Draws hover-aware menu buttons and button text.</td></tr>
+<tr><td><code>drawInputField()</code></td><td>Draws labeled username, password, and guest-name fields.</td></tr>
+<tr><td><code>drawGlyph()</code>, <code>drawText()</code>, <code>drawTextFit()</code></td><td>Render the built-in 5x7 pixel font.</td></tr>
+<tr><td><code>drawCoin()</code></td><td>Draws a filled circular coin with ring and highlight details.</td></tr>
+<tr><td><code>renderGameBoard()</code></td><td>Draws the active board, hover coin, falling coins, and turn indicator.</td></tr>
+</table>
+<pre><code>void drawInputField(const string&amp; label,const string&amp; value,
+                    bool active,bool masked,int x,int y,int w,int h){
+    Uint8 borderR=active?100:50,borderG=active?180:80,borderB=active?255:140;
+    SDL_Rect fill={x,y,w,h};
+    SDL_RenderFillRect(renderer,&amp;fill);
+    SDL_RenderDrawRect(renderer,&amp;fill);
+    drawText(label,x,y-22,160,185,225,3,180);
+}</code></pre>
+
+<h2>9. Board Logic and Win Detection</h2>
+<p>
+The move logic follows Connect Four gravity. When a player clicks a column, <code>getDropRow()</code>
+searches upward from the bottom row to find the first empty cell. <code>dropCoin()</code> writes the
+player number into that cell. After a successful drop, the game checks for a win, then checks for a draw,
+then switches turns if the game is still active.
+</p>
+
+<div class="figure">
+  <img src="media/win_logic.svg" alt="Core board algorithm for dropping a coin and detecting a win or draw.">
+  <div class="caption">Figure: Core board algorithm for dropping a coin and detecting a win or draw.</div>
+</div>
+
+<pre><code>bool dropCoin(int col, int player) {
+    for (int r=ROWS-1; r&gt;=0; r--)
+        if(board[r][col]==0){
+            board[r][col]=player;
+            return true;
+        }
+    return false;
+}
+
+bool wincheck(int p) const {
+    for(int r=0;r&lt;ROWS;r++) for(int c=0;c&lt;COLS;c++)
+        if(checkDir(p,r,c,0,1)||checkDir(p,r,c,1,0)||
+           checkDir(p,r,c,1,1)||checkDir(p,r,c,1,-1)) return true;
+    return false;
+}</code></pre>
+<p>
+The four directions are enough because scanning every cell with these forward directions covers every
+possible line of four: horizontal, vertical, diagonal down-right, and diagonal down-left.
+</p>
+
+<h2>10. Animation and Particles</h2>
+<p>
+The game separates board state from falling animation. The board is updated immediately when a move is
+accepted, but a <code>DroppingCoin</code> record is also added. While the record exists, the coin is drawn
+at an interpolated Y position. When the animation reaches the destination, the temporary record is removed.
+</p>
+<pre><code>struct DroppingCoin {
+    int col,row,player;
+    float startY,endY,t;
+    bool done;
+};
+
+void updateDropping(float dt){
+    float speed=dt/0.22f;
+    for(auto&amp; d:dropping){
+        if(d.done) continue;
+        d.t+=speed;
+        if(d.t&gt;=1.f){ d.t=1.f; d.done=true; }
+    }
+}</code></pre>
+<p>
+Particles are short-lived decorative objects. Each one has position, velocity, lifetime, and color.
+Every frame, velocity and gravity update the position; expired particles are removed by compacting the vector.
+</p>
+
+<div class="figure">
+  <img src="media/game_loop_sequence.svg" alt="Frame loop showing timing, input, updates, rendering, and presentation.">
+  <div class="caption">Figure: Frame loop showing timing, input, updates, rendering, and presentation.</div>
+</div>
+
+
+<h2>11. Memory Management and Cleanup</h2>
+<p>
+The game mostly uses automatic storage and standard containers, which clean themselves. SDL objects are
+the main manual resources. They are raw pointers because SDL is a C library. The code centralizes their
+cleanup in <code>cleanupSdl()</code>, and the destructor calls that cleanup exactly once.
+</p>
+
+<div class="figure">
+  <img src="media/memory_management.svg" alt="Memory ownership and pointer stability for SDL handles, accounts, and runtime arrays.">
+  <div class="caption">Figure: Memory ownership and pointer stability for SDL handles, accounts, and runtime arrays.</div>
+</div>
+
+<pre><code>void cleanupSdl(){
+    if(renderer){ SDL_DestroyRenderer(renderer); renderer=nullptr; }
+    if(window){ SDL_DestroyWindow(window); window=nullptr; }
+    if(sdlReady){ SDL_Quit(); sdlReady=false; }
+}
+
+Game(const Game&amp;) = delete;
+Game&amp; operator=(const Game&amp;) = delete;</code></pre>
+<p>
+The game object is marked non-copyable because copying it would copy SDL pointers. That could cause two
+objects to try to destroy the same renderer or window. Deleting copy construction and assignment prevents
+that class of bug at compile time.
+</p>
+<div class="note">
+The account list uses <code>deque&lt;UserAccount&gt;</code> instead of <code>vector&lt;UserAccount&gt;</code>
+because active players store pointers into the account container. This prevents pointer invalidation when
+a new account is registered during the same session.
+</div>
+
+<h2>12. Build and Run Notes</h2>
+<p>
+The checked-in Visual Studio project is the primary build path. It targets C++20, builds
+<code>ConnectGame.cpp</code>, and the x64 Debug/Release configurations reference SDL2 from
+<code>D:\SDL2-2.32.10</code>. The executable expects <code>SDL2.dll</code> beside it or available on
+the system path.
+</p>
+<pre><code>Open ConnectGame.slnx in Visual Studio
+Select x64 Debug or x64 Release
+Build and run the ConnectGame project</code></pre>
+<p>
+The same source can be built from a compiler command if SDL2 include and library paths are supplied.
+The exact flags depend on the local SDL2 installation. A typical MinGW-style command is:
+</p>
+<pre><code>g++ -std=c++20 ConnectGame.cpp -I/path/to/SDL2/include -L/path/to/SDL2/lib -lSDL2main -lSDL2 -o ConnectGame.exe</code></pre>
+<p>
+The Visual Studio Debug output is <code>x64/Debug/ConnectGame.exe</code>. At runtime, the program uses
+<code>users.txt</code> and <code>history.txt</code> in the working directory for persistence. If those files
+do not exist, the managers start with empty data.
+</p>
+
+<h2>13. Summary</h2>
+<p>
+This Connect Four project demonstrates a compact C++ SDL2 game architecture: a central game object,
+state-based screens, manual UI rendering, persistent users and match history, animated gameplay, and
+clear ownership cleanup. The core game logic is intentionally small and testable: a 2D integer board,
+gravity-based column insertion, and four-direction win scanning.
+</p>
+</body>
+</html>

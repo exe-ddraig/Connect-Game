@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260" role="img" aria-labelledby="title desc">
+  <title id="title">Win logic</title>
+  <desc id="desc">Column drop and four-direction win checking algorithm.</desc>
+  <style>text{font-family:Arial,Helvetica,sans-serif;fill:#172033;font-size:16px}.box{fill:#f7fbff;stroke:#2f6db5;stroke-width:2;rx:8}.line{stroke:#2f6db5;stroke-width:2;marker-end:url(#arrow)}</style>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2f6db5"/></marker></defs>
+  <rect x="30" y="95" width="135" height="70" class="box"/><text x="97" y="125" text-anchor="middle">Click</text><text x="97" y="148" text-anchor="middle">column</text>
+  <rect x="205" y="95" width="145" height="70" class="box"/><text x="277" y="125" text-anchor="middle">Find</text><text x="277" y="148" text-anchor="middle">drop row</text>
+  <rect x="390" y="95" width="145" height="70" class="box"/><text x="462" y="125" text-anchor="middle">Write</text><text x="462" y="148" text-anchor="middle">player id</text>
+  <rect x="575" y="45" width="145" height="70" class="box"/><text x="647" y="75" text-anchor="middle">Check</text><text x="647" y="98" text-anchor="middle">4 directions</text>
+  <rect x="575" y="155" width="145" height="70" class="box"/><text x="647" y="185" text-anchor="middle">Check</text><text x="647" y="208" text-anchor="middle">draw/full</text>
+  <rect x="760" y="95" width="110" height="70" class="box"/><text x="815" y="125" text-anchor="middle">Record</text><text x="815" y="148" text-anchor="middle">result</text>
+  <path d="M165 130 L205 130" class="line"/><path d="M350 130 L390 130" class="line"/><path d="M535 112 L575 82" class="line"/><path d="M535 148 L575 188" class="line"/><path d="M720 80 L760 112" class="line"/><path d="M720 190 L760 148" class="line"/>
+</svg>

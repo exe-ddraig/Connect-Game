@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-labelledby="title desc">
+  <title id="title">Connect Four project architecture</title>
+  <desc id="desc">High-level architecture showing Game owning SDL, board, accounts, history, session players, and effects.</desc>
+  <style>
+    text{font-family:Arial,Helvetica,sans-serif;fill:#172033;font-size:18px}
+    .box{fill:#f7fbff;stroke:#2f6db5;stroke-width:2;rx:8}
+    .core{fill:#eaf3ff;stroke:#164a8b;stroke-width:3;rx:8}
+    .line{stroke:#2f6db5;stroke-width:2;marker-end:url(#arrow)}
+  </style>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2f6db5"/></marker></defs>
+  <rect x="345" y="35" width="210" height="70" class="core"/><text x="450" y="78" text-anchor="middle">Game</text>
+  <rect x="70" y="170" width="150" height="70" class="box"/><text x="145" y="212" text-anchor="middle">SDL2</text>
+  <rect x="260" y="170" width="150" height="70" class="box"/><text x="335" y="212" text-anchor="middle">Board</text>
+  <rect x="450" y="170" width="170" height="70" class="box"/><text x="535" y="198" text-anchor="middle">Account</text><text x="535" y="222" text-anchor="middle">Manager</text>
+  <rect x="660" y="170" width="170" height="70" class="box"/><text x="745" y="198" text-anchor="middle">History</text><text x="745" y="222" text-anchor="middle">Manager</text>
+  <rect x="245" y="285" width="185" height="50" class="box"/><text x="337" y="316" text-anchor="middle">Session Players</text>
+  <rect x="470" y="285" width="185" height="50" class="box"/><text x="562" y="316" text-anchor="middle">Particles / Drops</text>
+  <path d="M380 105 L170 170" class="line"/><path d="M425 105 L350 170" class="line"/>
+  <path d="M475 105 L525 170" class="line"/><path d="M520 105 L720 170" class="line"/>
+  <path d="M405 105 L350 285" class="line"/><path d="M500 105 L560 285" class="line"/>
+</svg>
